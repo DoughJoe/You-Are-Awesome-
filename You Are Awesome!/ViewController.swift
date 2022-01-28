@@ -7,6 +7,7 @@
 
 
 import UIKit
+import AVFoundation
 
 class ViewController: UIViewController {
     @IBOutlet weak var messageLabel: UILabel!
@@ -14,34 +15,53 @@ class ViewController: UIViewController {
     
     var imageNumber = -1
     var messageNumber = -1
+    var soundNumber = -1
     let totalNumberOfImages = 9
+    let totalNumberOfSounds = 6
+    var audioPlayer: AVAudioPlayer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
     }
     
+    func playSound (name: String) {
+        if let sound = NSDataAsset(name: name) {
+            do {
+                try audioPlayer = AVAudioPlayer(data: sound.data)
+                audioPlayer.play()
+            } catch {
+                print("ERROR: \(error.localizedDescription)COULD NOT INITIALIZE AUDIO OBJECT")
+            }
+            
+        } else {
+            print("ERROR: COULD NOT READ AUDIO FILE")
+        }
+    }
+    
+    func nonRepeatingRandom(originalNumber: Int, upperLimit: Int) -> Int {
+        var newNumber: Int
+        repeat {
+            newNumber = Int.random(in: 0...upperLimit)
+        } while originalNumber == newNumber
+        return newNumber
+    }
+    
     @IBAction func messageButtonPress(_ sender: Any) {
-        let messages = ["You are Awesome!",
-                        "You are Great!",
-                        "You are Fab!",
-                        "You Good!",
+        let messages = ["I don't own a single table!",
+                        "Return the hot sauce!",
+                        "You are Awesome!",
+                        "Are you good?",
                         "Holy Moly. That's Wild.",
                         "What's Happening? Where am I?"]
         
-        var newMessageNumber: Int
-        repeat {
-            newMessageNumber = Int.random(in: 0...messages.count-1)
-        } while messageNumber == newMessageNumber
-        messageNumber = newMessageNumber
+        messageNumber = nonRepeatingRandom(originalNumber: messageNumber, upperLimit: messages.count-1)
         messageLabel.text = messages[messageNumber]
         
-        var newImageNumber: Int
-        repeat {
-            newImageNumber = Int.random(in: 0...totalNumberOfImages)
-        } while imageNumber == newImageNumber
-        imageNumber = newImageNumber
+        imageNumber = nonRepeatingRandom(originalNumber: imageNumber, upperLimit: totalNumberOfImages-1)
         imageView.image = UIImage(named: "image\(imageNumber)")
         
+        soundNumber = nonRepeatingRandom(originalNumber: soundNumber, upperLimit: totalNumberOfSounds-1)
+        playSound(name: "sound\(soundNumber)")
     }
     
 }
